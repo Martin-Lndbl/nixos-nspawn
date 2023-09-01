@@ -23,7 +23,7 @@
       {
         overlays.default = import ./overlays;
 
-        nixosConfigurations.container = nixpkgs.lib.nixosSystem {
+        nixosConfigurations.template = nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
           modules = [
             ./configuration

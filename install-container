@@ -1,28 +1,30 @@
 #! /bin/sh -eu
 
 if [ "$EUID" -ne 0 ]
-  then echo "Please run as root"
+  then echo "Root privileges needed to start container"
   exit
 fi
 
+container=$1
 
-profile=/nix/var/nix/profiles/per-container/$1
-gcroots=/nix/var/nix/gcroots/per-container/$1
-root=/var/lib/machines/$1
+profile=/nix/var/nix/profiles/per-container/$container
+gcroots=/nix/var/nix/gcroots/per-container/$container
+root=/var/lib/machines/$container
 
-config=$(nix build .#nixosConfigurations.x86_64-linux.container.config.system.build.toplevel --print-out-paths --no-link)
+config=$(nix build .#nixosConfigurations.x86_64-linux.$container.config.system.build.toplevel --print-out-paths --no-link)
 
-mkdir -p $profile /nix/var/nix/gcroots/per-container/$1
+mkdir -p $profile /nix/var/nix/gcroots/per-container/$container
 nix-env --set $config --profile $profile/system
 
 mkdir -p $root
 
 systemd-nspawn \
-  --machine $1 \
+  --machine $container \
   --directory $root \
   --bind-ro=/nix/store \
   --bind-ro=/nix/var/nix/db \
   --bind-ro=/nix/var/nix/daemon-socket \
   --bind="$profile:/nix/var/nix/profiles" \
   --bind="$gcroots:/nix/var/nix/gcroots" \
+  --private-network \
   $config/init

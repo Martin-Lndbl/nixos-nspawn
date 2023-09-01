@@ -2,6 +2,7 @@
 {
   environment.systemPackages = with pkgs; [
     vim
+    hello
   ];
 
   networking.useNetworkd = true;
@@ -13,6 +14,6 @@
     experimental-features = nix-command flakes
   '';
 
-  networking.hostName = "testc";
+  networking.hostName = "template";
   system.stateVersion = "23.05";
 }
