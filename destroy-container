@@ -1,0 +1,17 @@
+#! /bin/sh -eux
+
+if [ "$EUID" -ne 0 ]
+  then echo "Please run as root"
+  exit
+fi
+
+profile=/nix/var/nix/profiles/per-container/$1
+gcroots=/nix/var/nix/gcroots/per-container/$1
+root=/var/lib/machines/$1
+
+machinectl stop $1 2> /dev/null || true
+chattr -f -i $root/var/empty || true
+
+sleep 2
+
+rm -dfr $root $profile $gcroots || true
